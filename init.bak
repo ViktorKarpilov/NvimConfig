@@ -1,0 +1,322 @@
+" Set this to 1 to use ultisnips for snippet handling
+let s:using_snippets = 0
+
+call plug#begin('~/.vim/plugged')
+" Language syntax server
+Plug 'Decodetalkers/csharpls-extended-lsp.nvim', {'brach': 'release'}
+" Plug 'williamboman/nvim-lsp-installer'
+Plug 'williamboman/mason.nvim'
+" Plug 'neovim/nvim-lspconfig'
+
+Plug 'neovim/nvim-lspconfig'
+Plug 'hrsh7th/cmp-nvim-lsp'
+Plug 'hrsh7th/cmp-buffer'
+Plug 'hrsh7th/cmp-path'
+Plug 'hrsh7th/cmp-cmdline'
+Plug 'hrsh7th/nvim-cmp'
+
+" For vsnip users.
+Plug 'hrsh7th/cmp-vsnip'
+Plug 'hrsh7th/vim-vsnip'
+
+" Autocompletion
+"Plug 'ms-jpq/coq_nvim', {'commit': '84ec5faf2aaf49819e626f64dd94f4e71cf575bc'}
+
+" Highlighting
+Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+
+" Nerd tree
+Plug 'scrooloose/nerdtree'
+
+" Omnysharp
+Plug 'OmniSharp/omnisharp-vim'
+
+" Colorscheme
+Plug 'wuelnerdotexe/vim-enfocado'
+Plug 'sainnhe/everforest'
+
+" Statusline
+Plug 'itchyny/lightline.vim'
+Plug 'maximbaz/lightline-ale'
+
+" Searching
+Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+Plug 'junegunn/fzf.vim'
+
+Plug 'puremourning/vimspector'
+Plug 'folke/which-key.nvim'
+call plug#end()
+
+lua << EOF
+require("mason").setup()
+require("which-key").setup {}
+local wk = require("which-key")
+wk.register({
+  ["<F5>"]       = { "<Plug>VimspectorContinue", "Vimspector: start/continue debugging." },
+  ["<S-F5>"]     = { "<Plug>VimspectorStop", "Vimspector: stop debugging." },
+  ["<CS-F5"]     = { "<Plug>VimspectorRestart", "Vimspector: restart debugging." },
+  ["<F6>"]       = { "<Plug>VimspectorPause", "Vimspector: pause debugger." },
+  ["<F10>"]      = { "<Plug>VimspectorStepOver", "Vimspector: step over." },
+  ["<F11>"]      = { "<Plug>VimspectorStepInto", "Vimspector: step into." },
+  ["<S-F11>"]    = { "<Plug>VimspectorStepOut", "Vimspector: step out of current function." },
+})
+EOF
+" FZF find word
+
+function! FindWord()
+    call inputsave()
+    let replacement = input('Enter text:')
+    call inputrestore()
+    execute 'Ag '.replacement.''
+endfunction
+let g:fzf_action = {
+  \ 'ctrl-t': 'tab split',
+  \ 'ctrl-i': 'split',
+  \ 'ctrl-v': 'vsplit' }
+
+" Snippet support
+if s:using_snippets
+  Plug 'sirver/ultisnips'
+endif
+" Colorscheme
+" Important!!
+if has('termguicolors')
+    set termguicolors
+endif
+set background=dark
+" Set contrast.
+" This configuration option should be placed before `colorscheme everforest`.
+" Available values: 'hard', 'medium'(default), 'soft'
+let g:everforest_background = 'soft'
+" For better performance
+let g:everforest_better_performance = 1
+colorscheme everforest
+
+" Settings: {{{
+filetype indent plugin on
+if !exists('g:syntax_on') | syntax enable | endif
+set encoding=utf-8
+scriptencoding utf-8
+set number
+set relativenumber
+
+set backspace=indent,eol,start
+set expandtab
+set shiftround
+set shiftwidth=4
+set softtabstop=-1
+set tabstop=8
+set textwidth=80
+set title
+
+set hidden
+set nofixendofline
+set nostartofline
+set splitbelow
+set splitright
+
+set hlsearch
+set incsearch
+set laststatus=2
+set nonumber
+set noruler
+set noshowmode
+set signcolumn=yes
+
+set mouse=a
+set updatetime=1000
+
+noremap <C-A-k> :NERDTreeToggle<CR>
+
+noremap <silent> <C-S> :update<CR>
+noremap <silent> <C-S> :OmniSharpCodeFormat<CR>
+noremap <silent> <C-Z> u
+
+nnoremap <C-o><C-u> :OmniSharpFindUsages<CR>
+nnoremap <C-_> :OmniSharpGetCodeActions<CR>
+nnoremap <F12> :OmniSharpGotoDefinition<CR>
+nnoremap <C-F12> :OmniSharpFindImplementations<CR>
+nnoremap <C-o><C-d><C-p> :OmniSharpPreviewDefinition<CR>
+nnoremap <C-o><C-d><C-d> :OmniSharpDocumentation<CR>
+nnoremap <C-t><C-a> :OmniSharpRunTestsInFile<CR>
+nnoremap <C-t><C-t> :OmniSharpRunTest<CR>
+nnoremap <C-w><C-t> :tab split<CR>
+nnoremap <C-w><C-n> :tabnext<CR>
+
+nnoremap <C-o><C-r> :!dotnet run
+nnoremap <F9> :call vimspector#ToggleBreakpoint()<CR>
+
+nnoremap <C-f> :FZF<CR>
+nnoremap <C-A-f> :call FindWord()<CR>
+
+
+"Check if NERDTree is open or active
+function! RcisNERDTreeOpen()        
+  return exists("t:NERDTreeBufName") && (bufwinnr(t:NERDTreeBufName) != -1)
+endfunction
+
+" Call NERDTreeFind iff NERDTree is active, current window contains a modifiable
+" file, and we're not in vimdiff
+function! RcsyncTree()
+  if &modifiable && RcisNERDTreeOpen() && strlen(expand('%')) > 0 && !&diff
+    NERDTreeFind
+    wincmd p
+  endif
+endfunction
+
+" Highlight currently open buffer in NERDTree
+autocmd BufEnter * call RcsyncTree()
+
+lua << EOF
+
+ local pid = vim.fn.getpid()
+ local omnisharp_bin = "C:/Users/vkarpil/AppData/Local/omnisharp-vim/omnisharp-roslyn/OmniSharp.exe"
+
+local config = {
+  handlers = {
+    ["textDocument/definition"] = require('csharpls_extended').handler,
+  },
+  cmd = { omnisharp_bin, "--languageserver" , "--hostPID", tostring(pid) },
+  on_attach = on_attach,
+}
+
+
+  require'lspconfig'.csharp_ls.setup(config)
+
+ local on_attach = function(client, bufnr)
+   -- Enable completion triggered by <c-x><c-o>
+   vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
+
+   -- Mappings.
+   -- See `:help vim.lsp.*` for documentation on any of the below functions
+   vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<CR>', opts)
+   vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gd', '<cmd>lua vim.lsp.buf.definition()<CR>', opts)
+   vim.api.nvim_buf_set_keymap(bufnr, 'n', 'K', '<cmd>lua vim.lsp.buf.hover()<CR>', opts)
+   vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<CR>', opts)
+   vim.api.nvim_buf_set_keymap(bufnr, 'n', '<C-k>', '<cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
+   vim.api.nvim_buf_set_keymap(bufnr, 'n', '<space>wa', '<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>', opts)
+   vim.api.nvim_buf_set_keymap(bufnr, 'n', '<space>wr', '<cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>', opts)
+   vim.api.nvim_buf_set_keymap(bufnr, 'n', '<space>wl', '<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>', opts)
+   vim.api.nvim_buf_set_keymap(bufnr, 'n', '<space>D', '<cmd>lua vim.lsp.buf.type_definition()<CR>', opts)
+   vim.api.nvim_buf_set_keymap(bufnr, 'n', '<space>rn', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
+   vim.api.nvim_buf_set_keymap(bufnr, 'n', '<space>ca', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
+   vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
+   vim.api.nvim_buf_set_keymap(bufnr, 'n', '<space>f', '<cmd>lua vim.lsp.buf.formatting()<CR>', opts)
+ end
+
+ require 'nvim-treesitter.install'.compilers = { "clang" }
+ require'nvim-treesitter.configs'.setup {
+  -- A list of parser names, or "all"
+  ensure_installed = { "c_sharp" },
+
+  -- Install parsers synchronously (only applied to `ensure_installed`)
+  sync_install = false,
+
+  -- Automatically install missing parsers when entering buffer
+  -- Recommendation: set to false if you don't have `tree-sitter` CLI installed locally
+  auto_install = true,
+
+  -- List of parsers to ignore installing (for "all")
+  ignore_install = { "c" },
+
+  ---- If you need to change the installation directory of the parsers (see -> Advanced Setup)
+  -- parser_install_dir = "/some/path/to/store/parsers", -- Remember to run vim.opt.runtimepath:append("/some/path/to/store/parsers")!
+
+  highlight = {
+    -- `false` will disable the whole extension
+    enable = true,
+
+    -- NOTE: these are the names of the parsers and not the filetype. (for example if you want to
+    -- disable highlighting for the `tex` filetype, you need to include `latex` in this list as this is
+    -- the name of the parser)
+    -- list of language that will be disabled
+    disable = { "c"},
+
+    -- Setting this to true will run `:h syntax` and tree-sitter at the same time.
+    -- Set this to `true` if you depend on 'syntax' being enabled (like for indentation).
+    -- Using this option may slow down your editor, and you may see some duplicate highlights.
+    -- Instead of true it can also be a list of languages
+    additional_vim_regex_highlighting = false,
+  },
+}
+ local cmp = require'cmp'
+
+  cmp.setup({
+    snippet = {
+      -- REQUIRED - you must specify a snippet engine
+      expand = function(args)
+      end,
+    },
+    window = {
+      completion = cmp.config.window.bordered(),
+      documentation = cmp.config.window.bordered(),
+    },
+    mapping = cmp.mapping.preset.insert({
+      ['<C-b>'] = cmp.mapping.scroll_docs(-4),
+      ['<C-f>'] = cmp.mapping.scroll_docs(4),
+      ['<C-Space>'] = cmp.mapping.complete(),
+      ['<C-e>'] = cmp.mapping.abort(),
+      ['<CR>'] = cmp.mapping.confirm({ select = true }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
+    }),
+    sources = cmp.config.sources({
+      { name = 'nvim_lsp' },
+      { name = 'vsnip' },
+    }, {
+      { name = 'buffer' },
+    })
+  })
+
+  -- Set configuration for specific filetype.
+  cmp.setup.filetype('gitcommit', {
+    sources = cmp.config.sources({
+      { name = 'cmp_git' }, -- You can specify the `cmp_git` source if you were installed it.
+    }, {
+      { name = 'buffer' },
+    })
+  })
+
+  -- Use buffer source for `/` and `?` (if you enabled `native_menu`, this won't work anymore).
+  cmp.setup.cmdline({ '/', '?' }, {
+    mapping = cmp.mapping.preset.cmdline(),
+    sources = {
+      { name = 'buffer' }
+    }
+  })
+
+  -- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
+  cmp.setup.cmdline(':', {
+    mapping = cmp.mapping.preset.cmdline(),
+    sources = cmp.config.sources({
+      { name = 'path' }
+    }, {
+      { name = 'cmdline' }
+    })
+  })
+
+  -- Set up lspconfig.
+  local capabilities = require('cmp_nvim_lsp').default_capabilities()
+  -- Replace <YOUR_LSP_SERVER> with each lsp server you've enabled.
+  require('lspconfig')['csharp_ls'].setup {
+    capabilities = capabilities
+  }
+
+  vim.diagnostic.config({
+  virtual_text = false
+  })
+
+    vim.o.updatetime = 250
+
+  vim.api.nvim_create_autocmd('LspAttach', {
+    callback = function(args)
+    vim.api.nvim_create_autocmd({"CursorHold"}, {
+            pattern = {"*.cs"},
+            callback = function() vim.lsp.buf.signature_help() end,
+        })
+    vim.api.nvim_create_autocmd({"CursorHoldI"}, {
+            pattern = {"*.cs"},
+            callback = function() vim.diagnostic.open_float(nil, {focus=false}) end,
+        })
+    end,
+  })
+
+EOF
