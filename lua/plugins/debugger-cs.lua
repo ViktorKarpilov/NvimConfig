@@ -12,8 +12,8 @@ end
 
 function _G.search_dirs()
   local src_path = vim.fn.getcwd() .. "\\src\\"
-  -- local pattern = "\\w+\\.Host$"
-  local pattern = "Program.cs"
+  local pattern = "\\w+\\.Host$"
+  -- local pattern = "Program.cs"
   local cmd = string.format("fd %s %s", pattern, src_path)
   local output = vim.fn.system(cmd)
   if vim.v.shell_error ~= 0 then
@@ -92,7 +92,7 @@ return {
             request = "launch",
             program = function()
               if _G.selected_project_root then
-                local dotnet_dir = _G.selected_project_root .. "bin\\Debug\\"
+                local dotnet_dir = _G.selected_project_root .. "\\bin\\Debug\\"
                 local files = ls_dir(dotnet_dir)
                 if #files == 1 then
                   local dotnet_dir = files[1]

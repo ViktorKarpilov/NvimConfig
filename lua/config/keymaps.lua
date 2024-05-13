@@ -4,3 +4,7 @@
 
 local set = vim.keymap.set
 local opts = { silent = true }
+
+set("n", "<Tab>", "<C-i>", { desc = "Go forward in jumplist", remap = true })
+set("n", "<Leader>y", '"+y', { desc = "Yank to system buffer", remap = true })
+set("n", "<Leader>p", '"+y', { desc = "Paste from system buffer", remap = true })
