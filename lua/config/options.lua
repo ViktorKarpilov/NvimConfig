@@ -4,4 +4,4 @@
 local opt = vim.opt
 opt.shiftwidth = 4
 
-vim.lsp.set_log_level(vim.log.levels.DEBUG)
+vim.lsp.set_log_level(vim.log.levels.INFO)

@@ -6,4 +6,5 @@ return {
   { "nvim-ts-autotag", enabled = false },
   { "nvim-ts-context-commentstring", enabled = true },
   { "mfussenegger/nvim-lint", enabled = false },
+  { "bufferline.nvim", enabled = false },
 }
