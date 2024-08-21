@@ -10,13 +10,15 @@
 --   end,
 -- })
 
-vim.api.nvim_create_autocmd({ "FileType" }, {
-    pattern = "cs",
-    callback = function()
-        if _G.selected_project_root then
-            return
-        else
-            _G.search_dirs()
-        end
-    end
-})
+-- vim.api.nvim_create_autocmd({ "FileType" }, {
+--   pattern = { "cs" },
+--   callback = function()
+--     if _G.selected_project_root then
+--       return
+--     else
+--       _G.search_dirs()
+--     end
+--     ---@diagnostic disable-next-line: inject-field
+--     vim.b.autoformat = false
+--   end,
+-- })
