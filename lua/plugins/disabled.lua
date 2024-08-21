@@ -7,4 +7,5 @@ return {
   { "nvim-ts-context-commentstring", enabled = true },
   { "mfussenegger/nvim-lint", enabled = false },
   { "bufferline.nvim", enabled = false },
+  { "flash.nvim", enabled = false },
 }

@@ -64,53 +64,53 @@ end
 
 return {
   "mfussenegger/nvim-dap",
-  dependencies = {
-    "hrsh7th/cmp-emoji",
-    "nvim-telescope/telescope.nvim",
-    "nvim-lua/plenary.nvim",
-  },
-  optional = true,
-  opts = function()
-    local dap = require("dap")
-    if not dap.adapters["netcoredbg"] then
-      require("dap").adapters["netcoredbg"] = {
-        type = "executable",
-        command = "C:\\Users\\vkarpil\\AppData\\Local\\nvim-data\\netcoredbg\\netcoredbg\\netcoredbg.exe",
-        args = { "--interpreter=vscode" },
-        options = {
-          cwd = _G.selected_project_root,
-          detached = false,
-        },
-      }
-    end
-    for _, lang in ipairs({ "cs", "fsharp", "vb" }) do
-      if not dap.configurations[lang] then
-        dap.configurations[lang] = {
-          {
-            type = "netcoredbg",
-            name = "Nice launch",
-            request = "launch",
-            program = function()
-              if _G.selected_project_root then
-                local dotnet_dir = _G.selected_project_root .. "\\bin\\Debug\\"
-                local files = ls_dir(dotnet_dir)
-                if #files == 1 then
-                  local dotnet_dir = files[1]
-                  local target_assembly = dotnet_dir .. "\\" .. _G.selected_project_root:match("([^\\]+)\\?$") .. ".dll"
-                  return target_assembly
-                end
-
-                print("No dll found in " .. dotnet_dir)
-                return ""
-              else
-                _G.search_dirs()
-                return ""
-              end
-            end,
-            cwd = _G.selected_project_root,
-          },
-        }
-      end
-    end
-  end,
+  -- dependencies = {
+  --   "hrsh7th/cmp-emoji",
+  --   "nvim-telescope/telescope.nvim",
+  --   "nvim-lua/plenary.nvim",
+  -- },
+  -- optional = true,
+  -- opts = function()
+  --   local dap = require("dap")
+  --   if not dap.adapters["netcoredbg"] then
+  --     require("dap").adapters["netcoredbg"] = {
+  --       type = "executable",
+  --       command = "C:\\Users\\vkarpil\\AppData\\Local\\nvim-data\\netcoredbg\\netcoredbg\\netcoredbg.exe",
+  --       args = { "--interpreter=vscode" },
+  --       options = {
+  --         cwd = _G.selected_project_root,
+  --         detached = false,
+  --       },
+  --     }
+  --   end
+  --   for _, lang in ipairs({ "cs", "fsharp", "vb" }) do
+  --     if not dap.configurations[lang] then
+  --       dap.configurations[lang] = {
+  --         {
+  --           type = "netcoredbg",
+  --           name = "Nice launch",
+  --           request = "launch",
+  --           program = function()
+  --             if _G.selected_project_root then
+  --               local dotnet_dir = _G.selected_project_root .. "\\bin\\Debug\\"
+  --               local files = ls_dir(dotnet_dir)
+  --               if #files == 1 then
+  --                 local dotnet_dir = files[1]
+  --                 local target_assembly = dotnet_dir .. "\\" .. _G.selected_project_root:match("([^\\]+)\\?$") .. ".dll"
+  --                 return target_assembly
+  --               end
+  --
+  --               print("No dll found in " .. dotnet_dir)
+  --               return ""
+  --             else
+  --               _G.search_dirs()
+  --               return ""
+  --             end
+  --           end,
+  --           cwd = _G.selected_project_root,
+  --         },
+  --       }
+  --     end
+  --   end
+  -- end,
 }
